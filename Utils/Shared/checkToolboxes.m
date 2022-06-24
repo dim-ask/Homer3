@@ -38,9 +38,11 @@ end
 
 % User might want to regenrate list of toolboxes if new scripts were added
 % which might require new toolboxes.
+homerDir = fileparts(mfilename("fullpath"));
+toolReqPath = fullfile(homerDir,'..','..','toolboxesRequired.txt');
 if optionExists(options, 'regeneratelist')
-    if exist('./toolboxesRequired.txt', 'file')==2
-        delete('./toolboxesRequired.txt');
+    if exist(toolReqPath, 'file')==2
+        delete(toolReqPath);
     end
 end
 
@@ -51,8 +53,8 @@ header{2} = sprintf('List of required toolboxes for %s (v%s):\n', appname, versi
 header{3} = sprintf('==================================================\n');
 
 % Check for presence of file which already has all the toolboxes
-if exist('./toolboxesRequired.txt', 'file')==2
-    fid = fopen('./toolboxesRequired.txt');
+if exist(toolReqPath, 'file')==2
+    fid = fopen(toolReqPath);
     if(fid > 0)
         for ii=1:length(header)
             fprintf(header{ii});
@@ -82,7 +84,8 @@ end
 msg{1} = sprintf('Unable to find required toolbox list for the current Matlab release. ');
 msg{2} = sprintf('Do you want to run toolbox discovery to determine which are required? ');
 msg{3} = sprintf('(It takes 5-10 minutes).');
-q = MenuBox(msg, {'YES','NO'});
+% q = MenuBox(msg, {'YES','NO'});
+q = 1;
 if q==2
     r = -1;
     return;
@@ -142,7 +145,7 @@ fprintf('\n');
 
 cd(currdir);
 
-fid = fopen('./toolboxesRequired.txt','wt');
+fid = fopen(toolReqPath,'wt');
 for ii=1:length(header)
     fprintf(header{ii});
 end

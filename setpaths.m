@@ -8,7 +8,7 @@ function setpaths(options)
 %   setpaths(0)
 %
 currdir = pwd;
-
+homerDir = fileparts(mfilename("fullpath"));
 try
     
     warning('off','MATLAB:rmpath:DirNotFound');
@@ -28,7 +28,7 @@ try
     end
     
     % Add libraries on which Homer3 depends
-    addDependenciesSearchPaths()    
+    addDependenciesSearchPaths(homerDir)    
         
     % Create list of possible known similar apps that may conflic with current
     % app
@@ -36,7 +36,7 @@ try
     appNameInclList = {'AtlasViewerGUI'};
     exclSearchList  = {'.git','.idea','Data','Docs','*_install','*.app','submodules'};
     
-    appThis         = filesepStandard_startup(pwd);
+    appThis         = filesepStandard_startup(homerDir);
     appThisPaths    = findDotMFolders(appThis, exclSearchList);
     if addremove == 0
         if ~isempty(which('deleteNamespace.m'))
@@ -198,15 +198,15 @@ fprintf('REMOVED search paths for app %s\n', app);
 
 
 % ----------------------------------------------------
-function   addDependenciesSearchPaths()
-if exist([pwd, '/Utils/submodules'],'dir')
-    addpath([pwd, '/Utils/submodules'],'-end');
+function   addDependenciesSearchPaths(homerDir)
+if exist(fullfile(homerDir, '/Utils/submodules'),'dir')
+    addpath(fullfile(homerDir, '/Utils/submodules'),'-end');
 end
 d = dependencies();
 for ii = 1:length(d)
-    rootpath = findFolder(pwd, d{ii});
-    if ispathvalid_startup([rootpath, '/Shared'],'dir')
-        rootpath = [rootpath, '/Shared'];
+    rootpath = findFolder(homerDir, d{ii});
+    if ispathvalid_startup(fullfile(rootpath, '/Shared'),'dir')
+        rootpath = fullfile(rootpath, '/Shared');
     end
     if ~exist(rootpath,'dir')
         fprintf('ERROR: Could not find required dependency %s\n', d{ii})
@@ -214,8 +214,8 @@ for ii = 1:length(d)
     end
     addSearchPaths(rootpath);
 end
-if exist([pwd, '/Utils/submodules'],'dir')
-    addpath([pwd, '/Utils/submodules'],'-end');
+if exist(fullfile(homerDir, '/Utils/submodules'),'dir')
+    addpath(fullfile(homerDir, '/Utils/submodules'),'-end');
 end
 
 
